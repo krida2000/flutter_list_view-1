@@ -13,6 +13,7 @@ class FlutterSliverListController {
       onPaintItemPositionsCallback;
 
   FlutterListViewElement? _listView;
+
   void jumpToIndex(int index,
       {double offset = 0, bool offsetBasedOnBottom = false}) {
     if (_listView != null) {
@@ -54,6 +55,8 @@ class FlutterSliverListController {
       _listView!.pageUp();
     }
   }
+
+  double? getItemOffset(int index) => _listView?.getItemOffset(index);
 
   void attach(FlutterListViewElement listView) {
     _listView = listView;

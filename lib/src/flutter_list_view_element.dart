@@ -90,6 +90,15 @@ class FlutterListViewElement extends RenderObjectElement {
     renderObject.markNeedsLayout();
   }
 
+  double? getItemOffset(int index) {
+    for (var item in (renderObject as FlutterListViewRender).paintedElements) {
+      if (item.index == index) {
+        return item.offset;
+      }
+    }
+    return null;
+  }
+
   /// If the field is true, then next layout will remove all chilrend first
   /// Then create new children according to scrolloffset
   bool markAsInvalid = true;
@@ -319,7 +328,12 @@ class FlutterListViewElement extends RenderObjectElement {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (widget.controller != null) {
         if (widget.controller!.stickyIndex.value != index) {
-          widget.controller!.stickyIndex.value = index;
+          try {
+            widget.controller!.stickyIndex.value = index;
+          } catch (e) {
+            // [ValueNotifier] may be disposed at this moment, so it's allowed
+            // to fail.
+          }
         }
       }
     });
