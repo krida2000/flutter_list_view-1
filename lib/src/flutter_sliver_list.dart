@@ -7,7 +7,7 @@ import 'flutter_list_view_render.dart';
 class FlutterSliverList extends SliverWithKeepAliveWidget {
   /// Creates a sliver that places box children in a linear array.
   const FlutterSliverList({Key? key, required this.delegate, this.controller})
-      : super(key: key);
+    : super(key: key);
 
   final SliverChildDelegate delegate;
   final FlutterSliverListController? controller;

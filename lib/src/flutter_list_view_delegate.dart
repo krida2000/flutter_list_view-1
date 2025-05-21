@@ -18,29 +18,31 @@ class FlutterListViewDelegate extends SliverChildDelegate {
   /// providing a [findChildIndexCallback]. This allows the delegate to find the
   /// new index for a child that was previously located at a different index to
   /// attach the existing state to the [Widget] at its new location.
-  const FlutterListViewDelegate(this.builder,
-      {this.childCount,
-      this.addAutomaticKeepAlives = true,
-      this.addRepaintBoundaries = true,
-      this.addSemanticIndexes = true,
-      this.semanticIndexCallback = _kDefaultSemanticIndexCallback,
-      this.semanticIndexOffset = 0,
-      this.onItemKey,
-      this.keepPosition = false,
-      this.keepPositionOffset = 0,
-      this.onItemSticky,
-      this.stickyAtTailer = false,
-      this.onItemHeight,
-      this.preferItemHeight = 50,
-      this.firstItemAlign = FirstItemAlign.start,
-      this.initIndex = 0,
-      this.forceToExecuteInitIndex,
-      this.initOffset = 0.0,
-      this.initOffsetBasedOnBottom = false,
-      this.onIsPermanent,
-      this.isSupressElementGenerate = false,
-      this.disableCacheItems = false,
-      this.expandDirectToDownWhenFirstItemAlignToEnd = false});
+  const FlutterListViewDelegate(
+    this.builder, {
+    this.childCount,
+    this.addAutomaticKeepAlives = true,
+    this.addRepaintBoundaries = true,
+    this.addSemanticIndexes = true,
+    this.semanticIndexCallback = _kDefaultSemanticIndexCallback,
+    this.semanticIndexOffset = 0,
+    this.onItemKey,
+    this.keepPosition = false,
+    this.keepPositionOffset = 0,
+    this.onItemSticky,
+    this.stickyAtTailer = false,
+    this.onItemHeight,
+    this.preferItemHeight = 50,
+    this.firstItemAlign = FirstItemAlign.start,
+    this.initIndex = 0,
+    this.forceToExecuteInitIndex,
+    this.initOffset = 0.0,
+    this.initOffsetBasedOnBottom = false,
+    this.onIsPermanent,
+    this.isSupressElementGenerate = false,
+    this.disableCacheItems = false,
+    this.expandDirectToDownWhenFirstItemAlignToEnd = false,
+  });
 
   /// When childCount from 0 to non-zore, the [initIndex] will effect,
   /// When initIndex changed, if child count is not 0, it also effect
@@ -207,7 +209,9 @@ class FlutterListViewDelegate extends SliverChildDelegate {
       final int? semanticIndex = semanticIndexCallback(child, index);
       if (semanticIndex != null) {
         child = IndexedSemantics(
-            index: semanticIndex + semanticIndexOffset, child: child);
+          index: semanticIndex + semanticIndexOffset,
+          child: child,
+        );
       }
     }
     if (addAutomaticKeepAlives) child = AutomaticKeepAlive(child: child);

@@ -19,7 +19,9 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   _handleInitIndex(
-      SliverChildDelegate newDelegate, SliverChildDelegate? oldDelegate) {
+    SliverChildDelegate newDelegate,
+    SliverChildDelegate? oldDelegate,
+  ) {
     int oldInitIndex = 0;
     int newInitIndex = 0;
     int oldChildCount = 0;
@@ -84,7 +86,8 @@ class FlutterListViewElement extends RenderObjectElement {
     final SliverChildDelegate oldDelegate = oldWidget.delegate;
     if (newDelegate != oldDelegate &&
         (newDelegate.runtimeType != oldDelegate.runtimeType ||
-            newDelegate.shouldRebuild(oldDelegate))) performRebuild();
+            newDelegate.shouldRebuild(oldDelegate)))
+      performRebuild();
     _handleInitIndex(newDelegate, oldDelegate);
     markAsInvalid = true;
     renderObject.markNeedsLayout();
@@ -158,8 +161,10 @@ class FlutterListViewElement extends RenderObjectElement {
   double get totalItemHeight => _totalItemHeight;
 
   void jumpToIndex(int index, double offset, bool basedOnBottom) {
-    assert(index >= 0 && index < childCount,
-        "Index should be >=0 and  < child count");
+    assert(
+      index >= 0 && index < childCount,
+      "Index should be >=0 and  < child count",
+    );
     indexShoudBeJumpTo = index;
     indexShoudBeJumpOffset = offset;
     offsetBasedOnBottom = basedOnBottom;
@@ -167,13 +172,17 @@ class FlutterListViewElement extends RenderObjectElement {
     renderObject.markNeedsLayout();
   }
 
-  Future<void> animateToIndex(int index,
-      {required double offset,
-      required bool basedOnBottom,
-      required Duration duration,
-      required Curve curve}) async {
-    assert(index >= 0 && index < childCount,
-        "Index should be >=0 and  <= child count");
+  Future<void> animateToIndex(
+    int index, {
+    required double offset,
+    required bool basedOnBottom,
+    required Duration duration,
+    required Curve curve,
+  }) async {
+    assert(
+      index >= 0 && index < childCount,
+      "Index should be >=0 and  <= child count",
+    );
 
     var scrollOffset = getScrollOffsetByIndex(index);
     var flutterListViewRender = renderObject as FlutterListViewRender;
@@ -250,8 +259,10 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   void ensureVisible(int index, double offset, bool? basedOnBottom) {
-    assert(index >= 0 && index < childCount,
-        "Index should be >=0 and  < child count");
+    assert(
+      index >= 0 && index < childCount,
+      "Index should be >=0 and  < child count",
+    );
     var sdata = getVisibleIndexData();
     int first = sdata[0];
     int last = sdata[1];
@@ -266,7 +277,6 @@ class FlutterListViewElement extends RenderObjectElement {
     var flutterListViewRender = renderObject as FlutterListViewRender;
     var viewportHeight = flutterListViewRender.currentViewportHeight ?? 0;
     var sdata = getVisibleIndexData();
-    int first = sdata[0];
     int last = sdata[1];
     double totalHeight = sdata[2];
     if (totalHeight <= viewportHeight) {
@@ -288,7 +298,6 @@ class FlutterListViewElement extends RenderObjectElement {
     var viewportHeight = flutterListViewRender.currentViewportHeight ?? 0;
     var sdata = getVisibleIndexData();
     int first = sdata[0];
-    int last = sdata[1];
     double totalHeight = sdata[2];
     if (totalHeight <= viewportHeight) {
       // perfect alignment
@@ -318,7 +327,8 @@ class FlutterListViewElement extends RenderObjectElement {
       } catch (e, s) {
         if (kDebugMode) {
           print(
-              "error in notifyPositionChanged in flutter list view element, $e, $s");
+            "error in notifyPositionChanged in flutter list view element, $e, $s",
+          );
         }
       }
     });
@@ -340,7 +350,9 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   void notifyPaintItemPositionsCallback(
-      double widgetHeight, List<FlutterListViewItemPosition> paintElements) {
+    double widgetHeight,
+    List<FlutterListViewItemPosition> paintElements,
+  ) {
     try {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         var onPaintItemPositionsCallback =
@@ -558,7 +570,10 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   FlutterListViewRenderData constructOneIndexElement(
-      int index, double itemOffset, bool needInsertToRenderElement) {
+    int index,
+    double itemOffset,
+    bool needInsertToRenderElement,
+  ) {
     var result = _createOrReuseElement(index);
     result.offset = itemOffset;
     if (needInsertToRenderElement) {
@@ -592,12 +607,16 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   /// 返回新的与旧的差别
-  double updateElementPosition(
-      {required FlutterListViewRenderData spEle,
-      required double newHeight,
-      required bool needUpdateNextElementOffset}) {
-    var diff =
-        updateElementPosition2(spEle, offset: spEle.offset, height: newHeight);
+  double updateElementPosition({
+    required FlutterListViewRenderData spEle,
+    required double newHeight,
+    required bool needUpdateNextElementOffset,
+  }) {
+    var diff = updateElementPosition2(
+      spEle,
+      offset: spEle.offset,
+      height: newHeight,
+    );
 
     // 更新所有后面的offset;
     if (needUpdateNextElementOffset) {
@@ -605,8 +624,9 @@ class FlutterListViewElement extends RenderObjectElement {
         var item = _renderedElements[i];
         item.offset += diff;
         if (item.element.renderObject != null) {
-          final itemParentData = item.element.renderObject!.parentData!
-              as SliverMultiBoxAdaptorParentData;
+          final itemParentData =
+              item.element.renderObject!.parentData!
+                  as SliverMultiBoxAdaptorParentData;
           itemParentData.layoutOffset = item.offset;
         }
       }
@@ -627,8 +647,9 @@ class FlutterListViewElement extends RenderObjectElement {
     spEle.offset = offset;
     spEle.height = height;
     if (spEle.element.renderObject!.parentData != null) {
-      final parentData = spEle.element.renderObject!.parentData!
-          as SliverMultiBoxAdaptorParentData;
+      final parentData =
+          spEle.element.renderObject!.parentData!
+              as SliverMultiBoxAdaptorParentData;
       parentData.layoutOffset = spEle.offset;
     }
     setItemHeight(getKeyByItemIndex(spEle.index), height);
@@ -647,12 +668,13 @@ class FlutterListViewElement extends RenderObjectElement {
     var height = getItemHeight(itemKey, index);
     var isSticky = queryIsStickyItemByIndex(index);
     var result = FlutterListViewRenderData(
-        element: newElement!,
-        index: index,
-        offset: 0,
-        height: height,
-        itemKey: itemKey,
-        isSticky: isSticky);
+      element: newElement!,
+      index: index,
+      offset: 0,
+      height: height,
+      itemKey: itemKey,
+      isSticky: isSticky,
+    );
 
     return result;
   }
@@ -668,7 +690,9 @@ class FlutterListViewElement extends RenderObjectElement {
   }
 
   FlutterListViewRenderData? constructNextElement(
-      double targetStartScrollOffset, double targetEndScrollOffset) {
+    double targetStartScrollOffset,
+    double targetEndScrollOffset,
+  ) {
     double endOffset = targetEndScrollOffset;
 
     FlutterListViewRenderData? result;
@@ -770,9 +794,10 @@ class FlutterListViewElement extends RenderObjectElement {
       // manually.
       int lo = 0;
       int hi = 1;
-      const int max = kIsWeb
-          ? 9007199254740992 // max safe integer on JS (from 0 to this number x != x+1)
-          : ((1 << 63) - 1);
+      const int max =
+          kIsWeb
+              ? 9007199254740992 // max safe integer on JS (from 0 to this number x != x+1)
+              : ((1 << 63) - 1);
       while (_build(hi - 1) != null) {
         lo = hi - 1;
         if (hi < max ~/ 2) {
@@ -860,7 +885,10 @@ class FlutterListViewElement extends RenderObjectElement {
 
   @override
   void moveRenderObjectChild(
-      covariant RenderObject child, int oldSlot, int newSlot) {}
+    covariant RenderObject child,
+    int oldSlot,
+    int newSlot,
+  ) {}
 
   @override
   void removeRenderObjectChild(covariant RenderObject child, int slot) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'test_keep_alive_issue_item.dart';
 
-
 class TestKeepAliveIssue extends StatefulWidget {
   const TestKeepAliveIssue({Key? key}) : super(key: key);
 
