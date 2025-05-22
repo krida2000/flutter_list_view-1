@@ -5,7 +5,7 @@
 ## 0.1.1
 * Provide jumpToIndex
 ## 1.0.0
-* Provide anmiteToIndex
+* Provide animateToIndex
 * Integrate pull_to_refresh
 
 ## 1.0.2
@@ -37,7 +37,7 @@
 * Provide option to determine whether or not generate items during scrolling to make scroll to index more smooth
 
 ## 1.1.2
-* Fix bug: It cause exception when the user stop scroll manually while invoke animite to index
+* Fix bug: It cause exception when the user stop scroll manually while invoke animate to index
 
 ## 1.1.3
 * Add FlutterListView.builder and FlutterListView.separated
@@ -95,6 +95,9 @@
 
 ## 1.1.29
 * expose getVisibleIndexData method in controller
+
+## 1.1.30
+* add stickyItemOffset parameter
 
 ## TODO
 * Add horizontal scroll support
