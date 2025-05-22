@@ -26,6 +26,7 @@ class FlutterListViewRender extends RenderSliver
   /// [_trackedNextStickyElement] is evaluate in performLayout and used it paint
   FlutterListViewRenderData? _trackedNextStickyElement;
   List<FlutterListViewRenderData> paintedElements = [];
+
   // Visible element
   List<FlutterListViewRenderData> paintedElementsInViewport = [];
 
@@ -107,6 +108,7 @@ class FlutterListViewRender extends RenderSliver
   /// The field will indicate next layout will not remove out of scope elements
   /// true: only need correct layout
   bool _isAdjustOperation = false;
+
   // Does scroll offset changed base last scroll offset
   double? _scrollOffsetDifferFromLast;
   double? lastScrollOffset;
@@ -668,22 +670,24 @@ class FlutterListViewRender extends RenderSliver
     if (cacheOrigin <= 0 &&
         constraints.remainingPaintExtent >= viewportHeight &&
         childManager.totalItemHeight > viewportHeight) {
-      FlutterListViewRenderData? fristOrLastElementInViewport;
+      FlutterListViewRenderData? firstOrLastElementInViewport;
 
       bool oldStickyInRenderedElements = false;
 
       for (var i = childManager.renderedElements.length - 1; i >= 0; i--) {
         var item = childManager.renderedElements[i];
 
-        if (fristOrLastElementInViewport == null &&
-            item.offset + item.height < scrollOffset + viewportHeight) {
-          fristOrLastElementInViewport = item;
+        if (firstOrLastElementInViewport == null &&
+            item.offset + item.height <
+                scrollOffset + viewportHeight - childManager.stickyItemOffset) {
+          firstOrLastElementInViewport = item;
         }
+
         if (item == childManager.stickyElement) {
           oldStickyInRenderedElements = true;
         }
 
-        if (fristOrLastElementInViewport != null &&
+        if (firstOrLastElementInViewport != null &&
             _trackedNextStickyElement == null) {
           var isSticky = childManager.queryIsStickyItemByIndex(item.index);
           if (isSticky) {
@@ -694,9 +698,9 @@ class FlutterListViewRender extends RenderSliver
 
       int? prevStickyIndex;
       // Find prev sticky index
-      if (fristOrLastElementInViewport != null) {
+      if (firstOrLastElementInViewport != null) {
         for (
-          var i = fristOrLastElementInViewport.index + 1;
+          var i = firstOrLastElementInViewport.index + 1;
           i < childManager.childCount;
           i++
         ) {
@@ -960,7 +964,12 @@ class FlutterListViewRender extends RenderSliver
     }
 
     if (childManager.stickyAtTailer) {
-      paintTailerSticky(context, offset, nextStickyOffset, growInfo);
+      paintTailerSticky(
+        context,
+        offset,
+        nextStickyOffset?.translate(0, childManager.stickyItemOffset),
+        growInfo,
+      );
     } else {
       paintHeaderSticky(context, offset, nextStickyOffset, growInfo);
     }
@@ -1036,7 +1045,10 @@ class FlutterListViewRender extends RenderSliver
           if (growInfo.axisDirection == AxisDirection.up) {
             stickyOffsetDy = offset.dy;
           }
-          var childOffset = Offset(offset.dx, stickyOffsetDy);
+          var childOffset = Offset(
+            offset.dx,
+            stickyOffsetDy + childManager.stickyItemOffset,
+          );
           paintItem(context, stickyRenderObj, childOffset);
         } else {
           var stickyOffsetDy =
@@ -1048,7 +1060,10 @@ class FlutterListViewRender extends RenderSliver
                 _trackedNextStickyElement!.height -
                 stickyRenderObj.size.height;
           }
-          var childOffset = Offset(0, stickyOffsetDy);
+          var childOffset = Offset(
+            0,
+            stickyOffsetDy + childManager.stickyItemOffset,
+          );
           paintItem(context, stickyRenderObj, childOffset);
         }
       }

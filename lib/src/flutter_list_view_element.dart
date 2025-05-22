@@ -438,6 +438,15 @@ class FlutterListViewElement extends RenderObjectElement {
     return false;
   }
 
+  double get stickyItemOffset {
+    if (widget.delegate is FlutterListViewDelegate) {
+      var flutterListDelegate = widget.delegate as FlutterListViewDelegate;
+      return flutterListDelegate.stickyItemOffset;
+    }
+
+    return 0;
+  }
+
   bool get isSupportSticky {
     if (widget.delegate is FlutterListViewDelegate) {
       var flutterListDelegate = widget.delegate as FlutterListViewDelegate;

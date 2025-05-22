@@ -31,6 +31,7 @@ class FlutterListViewDelegate extends SliverChildDelegate {
     this.keepPositionOffset = 0,
     this.onItemSticky,
     this.stickyAtTailer = false,
+    this.stickyItemOffset = 0,
     this.onItemHeight,
     this.preferItemHeight = 50,
     this.firstItemAlign = FirstItemAlign.start,
@@ -83,6 +84,10 @@ class FlutterListViewDelegate extends SliverChildDelegate {
   /// [stickyAtTailer] is mean sticky from bottom to top, in normal sticky item will show on top, but if it is true, it mean the sticky will show on bottom
   final FlutterListViewDelegateOnItemSticky? onItemSticky;
   final bool stickyAtTailer;
+
+  /// Offset ot the sticky header.
+  /// Should be used if list have an overlapping content on top.
+  final double stickyItemOffset;
 
   /// If you know the item height, it is better provider the height
   /// It can provide better user expierence
