@@ -652,6 +652,7 @@ class FlutterListViewRender extends RenderSliver
         prevStickyIndex,
         null,
         oldStickyInRenderedElements,
+        false,
       );
     }
 
@@ -675,6 +676,7 @@ class FlutterListViewRender extends RenderSliver
       FlutterListViewRenderData? firstOrLastElementInViewport;
 
       bool oldStickyInRenderedElements = false;
+      bool oldPrevStickyInRenderedElements = false;
 
       for (var i = childManager.renderedElements.length - 1; i >= 0; i--) {
         var item = childManager.renderedElements[i];
@@ -687,6 +689,10 @@ class FlutterListViewRender extends RenderSliver
 
         if (item == childManager.stickyElement) {
           oldStickyInRenderedElements = true;
+        }
+
+        if (item == childManager.prevStickyElement) {
+          oldPrevStickyInRenderedElements = true;
         }
 
         if (firstOrLastElementInViewport != null &&
@@ -731,6 +737,7 @@ class FlutterListViewRender extends RenderSliver
         prevStickyIndex,
         prevPrevStickyIndex,
         oldStickyInRenderedElements,
+        oldPrevStickyInRenderedElements,
       );
     }
 
@@ -746,6 +753,7 @@ class FlutterListViewRender extends RenderSliver
     int? prevStickyIndex,
     int? prevPrevStickyIndex,
     bool oldStickyInRenderedElements,
+    bool oldPrevStickyInRenderedElements,
   ) {
     FlutterListViewRenderData? prevStickyElement;
     FlutterListViewRenderData? removedSticky;
@@ -844,7 +852,7 @@ class FlutterListViewRender extends RenderSliver
     }
 
     if (removedPrevSticky != null) {
-      if (oldStickyInRenderedElements == false) {
+      if (oldPrevStickyInRenderedElements == false) {
         invokeLayoutCallback((constraints) {
           childManager.removeChildElement(removedPrevSticky!.element);
         });
@@ -1230,13 +1238,6 @@ class FlutterListViewRender extends RenderSliver
         if (element == stickyElement) {
           stickyIsInRenderedElements = true;
         }
-      }
-    }
-
-    for (var element in renderedElements) {
-      if (element.element.renderObject != null &&
-          element.element.renderObject?.parent == this) {
-        handler(element.element.renderObject!);
         if (element == prevStickyElement) {
           prevStickyIsInRenderedElements = true;
         }
