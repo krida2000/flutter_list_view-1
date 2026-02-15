@@ -59,8 +59,8 @@ class FlutterListViewElement extends RenderObjectElement {
     }
 
     if (needJump) {
-      indexShoudBeJumpTo = newInitIndex;
-      indexShoudBeJumpOffset = newInitOffset;
+      indexShouldBeJumpTo = newInitIndex;
+      indexShouldBeJumpOffset = newInitOffset;
       offsetBasedOnBottom = newInitOffsetBasedOnBottom;
       markAsInvalid = true;
     }
@@ -86,8 +86,9 @@ class FlutterListViewElement extends RenderObjectElement {
     final SliverChildDelegate oldDelegate = oldWidget.delegate;
     if (newDelegate != oldDelegate &&
         (newDelegate.runtimeType != oldDelegate.runtimeType ||
-            newDelegate.shouldRebuild(oldDelegate)))
+            newDelegate.shouldRebuild(oldDelegate))) {
       performRebuild();
+    }
     _handleInitIndex(newDelegate, oldDelegate);
     markAsInvalid = true;
     renderObject.markNeedsLayout();
@@ -102,21 +103,21 @@ class FlutterListViewElement extends RenderObjectElement {
     return null;
   }
 
-  /// If the field is true, then next layout will remove all chilrend first
+  /// If the field is true, then next layout will remove all children first
   /// Then create new children according to scrolloffset
   bool markAsInvalid = true;
 
-  /// [indexShoudBeJumpTo] is mean not jump to
-  /// [redoJumpIndexTimes] is used to two times evalute the position
-  int? indexShoudBeJumpTo;
-  double indexShoudBeJumpOffset = 0.0;
+  /// [indexShouldBeJumpTo] is mean not jump to
+  /// [redoJumpIndexTimes] is used to two times evaluate the position
+  int? indexShouldBeJumpTo;
+  double indexShouldBeJumpOffset = 0.0;
 
-  /// [offsetBasedOnBottom] only apply to jumpTo and comunicate with render
+  /// [offsetBasedOnBottom] only apply to jumpTo and communicate with render
   bool offsetBasedOnBottom = false;
 
-  /// When [supressElementGenerate] is true, then notify render don't need
-  /// create and drop element, just kepp current element
-  bool supressElementGenerate = false;
+  /// When [suppressElementGenerate] is true, then notify render don't need
+  /// create and drop element, just keep current element
+  bool suppressElementGenerate = false;
 
   /// Does it in scrolling when the user invoke animateToIndex
   /// During scrolling, the item's height will not be save
@@ -148,10 +149,13 @@ class FlutterListViewElement extends RenderObjectElement {
   /// Current sticky element which show on top of list
   FlutterListViewRenderData? stickyElement;
 
+  /// Prev sticky element
+  FlutterListViewRenderData? prevStickyElement;
+
   /// It will store the height of item which has rendered or provide by feedback
   final Map<String, double> _itemHeights = {};
 
-  /// The cache'd element. These element will be reused
+  /// The cached element. These element will be reused
   final List<FlutterListViewRenderData> _cachedElements = [];
   List<FlutterListViewRenderData> get cachedElements => _cachedElements;
 
@@ -163,10 +167,10 @@ class FlutterListViewElement extends RenderObjectElement {
   void jumpToIndex(int index, double offset, bool basedOnBottom) {
     assert(
       index >= 0 && index < childCount,
-      "Index should be >=0 and  < child count",
+      "Index should be >=0 and < child count",
     );
-    indexShoudBeJumpTo = index;
-    indexShoudBeJumpOffset = offset;
+    indexShouldBeJumpTo = index;
+    indexShouldBeJumpOffset = offset;
     offsetBasedOnBottom = basedOnBottom;
     markAsInvalid = true;
     renderObject.markNeedsLayout();
@@ -181,7 +185,7 @@ class FlutterListViewElement extends RenderObjectElement {
   }) async {
     assert(
       index >= 0 && index < childCount,
-      "Index should be >=0 and  <= child count",
+      "Index should be >=0 and <= child count",
     );
 
     var scrollOffset = getScrollOffsetByIndex(index);
@@ -197,10 +201,10 @@ class FlutterListViewElement extends RenderObjectElement {
 
     if (scrollOffset < 0) scrollOffset = 0;
 
-    supressElementGenerate = false;
+    suppressElementGenerate = false;
     if (widget.delegate is FlutterListViewDelegate) {
       var flutterListDelegate = widget.delegate as FlutterListViewDelegate;
-      supressElementGenerate = flutterListDelegate.isSupressElementGenerate;
+      suppressElementGenerate = flutterListDelegate.isSupressElementGenerate;
     }
 
     try {
@@ -213,7 +217,7 @@ class FlutterListViewElement extends RenderObjectElement {
       }
     } finally {
       _isInScrolling = false;
-      supressElementGenerate = false;
+      suppressElementGenerate = false;
     }
 
     jumpToIndex(index, offset, basedOnBottom);
@@ -261,7 +265,7 @@ class FlutterListViewElement extends RenderObjectElement {
   void ensureVisible(int index, double offset, bool? basedOnBottom) {
     assert(
       index >= 0 && index < childCount,
-      "Index should be >=0 and  < child count",
+      "Index should be >=0 and < child count",
     );
     var sdata = getVisibleIndexData();
     int first = sdata[0];
@@ -557,6 +561,9 @@ class FlutterListViewElement extends RenderObjectElement {
         if (item == stickyElement) {
           stickyElement = null;
         }
+        if (item == prevStickyElement) {
+          prevStickyElement = null;
+        }
       } else {
         break;
       }
@@ -571,6 +578,9 @@ class FlutterListViewElement extends RenderObjectElement {
         putRenderItemToCacheOrPermanent(item);
         if (item == stickyElement) {
           stickyElement = null;
+        }
+        if (item == prevStickyElement) {
+          prevStickyElement = null;
         }
       } else {
         break;
@@ -841,17 +851,25 @@ class FlutterListViewElement extends RenderObjectElement {
     // The toList() is to make a copy so that the underlying list can be modified by
     // the visitor:
     bool stickyElementHasVisited = false;
+    bool prevStickyElementHasVisited = false;
     for (var item in _renderedElements) {
       if (item.element.renderObject?.parent != null) {
         visitor(item.element);
         if (item == stickyElement) {
           stickyElementHasVisited = true;
         }
+        if (item == prevStickyElement) {
+          prevStickyElementHasVisited = true;
+        }
       }
     }
 
     if (stickyElement != null && stickyElementHasVisited == false) {
       visitor(stickyElement!.element);
+    }
+
+    if (prevStickyElement != null && prevStickyElementHasVisited == false) {
+      visitor(prevStickyElement!.element);
     }
 
     for (var item in cachedElements) {
@@ -911,6 +929,9 @@ class FlutterListViewElement extends RenderObjectElement {
         if (item == stickyElement) {
           stickyElement = null;
         }
+        if (item == prevStickyElement) {
+          prevStickyElement = null;
+        }
       }
       _renderedElements.clear();
     }
@@ -918,7 +939,11 @@ class FlutterListViewElement extends RenderObjectElement {
     if (stickyElement != null) {
       removeChildElement(stickyElement!.element);
     }
+    if (prevStickyElement != null) {
+      removeChildElement(prevStickyElement!.element);
+    }
     stickyElement = null;
+    prevStickyElement = null;
 
     for (var item in cachedElements) {
       removeChildElement(item.element);
@@ -938,13 +963,20 @@ class FlutterListViewElement extends RenderObjectElement {
       if (item == stickyElement) {
         stickyElement = null;
       }
+      if (item == prevStickyElement) {
+        prevStickyElement = null;
+      }
     }
     _renderedElements.clear();
 
     if (stickyElement != null) {
       putRenderItemToCacheOrPermanent(stickyElement!);
     }
+    if (prevStickyElement != null) {
+      putRenderItemToCacheOrPermanent(prevStickyElement!);
+    }
     stickyElement = null;
+    prevStickyElement = null;
   }
 
   bool isPermanentItem(String key) {
